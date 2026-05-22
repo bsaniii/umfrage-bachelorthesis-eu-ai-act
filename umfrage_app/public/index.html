@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Umfrage: EU AI Act in der Praxis</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --purple:#534AB7;--purple-light:#EEEDFE;--purple-dark:#3C3489;
+  --teal:#0F6E56;--teal-light:#E1F5EE;
+  --text:#1a1a1a;--text-muted:#6b6b6b;--text-hint:#9b9b9b;
+  --bg:#fff;--bg-surface:#f8f8f7;--border:rgba(0,0,0,0.12);--border-strong:rgba(0,0,0,0.28);
+  --radius:8px;--radius-lg:12px;
+}
+@media(prefers-color-scheme:dark){:root{
+  --text:#f0f0f0;--text-muted:#aaa;--text-hint:#666;
+  --bg:#1c1c1e;--bg-surface:#2a2a2c;--border:rgba(255,255,255,0.1);--border-strong:rgba(255,255,255,0.25);
+  --purple-light:#26215C;--purple-dark:#AFA9EC;
+}}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;background:var(--bg-surface);color:var(--text);min-height:100vh;padding:24px 16px}
+.card{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:28px 24px;max-width:680px;margin:0 auto}
+.logo-row{display:flex;align-items:center;gap:10px;margin-bottom:24px}
+.logo-mark{width:32px;height:32px;background:var(--purple);border-radius:var(--radius);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.logo-mark svg{width:18px;height:18px;fill:none;stroke:white;stroke-width:2}
+.uni-label{font-size:12px;color:var(--text-muted);font-weight:500;line-height:1.4}
+.progress-wrap{margin-bottom:28px}
+.progress-bg{height:3px;background:var(--border);border-radius:2px}
+.progress-fill{height:3px;background:var(--purple);border-radius:2px;transition:width .4s ease}
+.progress-meta{display:flex;justify-content:space-between;margin-top:6px;font-size:12px;color:var(--text-hint)}
+.badge{display:inline-block;background:var(--purple-light);color:var(--purple-dark);font-size:11px;font-weight:500;padding:3px 10px;border-radius:20px;margin-bottom:10px;letter-spacing:.03em}
+h1{font-size:20px;font-weight:600;margin-bottom:10px;line-height:1.35;color:var(--text)}
+.intro-text{font-size:14px;color:var(--text-muted);line-height:1.75;margin-bottom:20px}
+.notice{background:var(--purple-light);border-radius:var(--radius);padding:12px 14px;font-size:13px;color:var(--purple-dark);margin-bottom:22px;display:flex;gap:10px;align-items:flex-start;line-height:1.55}
+.notice svg{width:16px;height:16px;flex-shrink:0;margin-top:1px;fill:none;stroke:var(--purple);stroke-width:2}
+.q-block{margin-bottom:22px}
+.q-label{font-size:14px;font-weight:500;margin-bottom:8px;line-height:1.5;color:var(--text)}
+.q-req{color:#D85A30}
+.q-hint{font-size:12px;color:var(--text-hint);margin-bottom:8px;line-height:1.4}
+.opts{display:flex;flex-direction:column;gap:6px}
+.opt{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border:0.5px solid var(--border);border-radius:var(--radius);cursor:pointer;transition:all .15s;user-select:none}
+.opt:hover{border-color:var(--border-strong);background:var(--bg-surface)}
+.opt.sel{border-color:var(--purple);background:var(--purple-light)}
+.opt input{margin-top:2px;accent-color:var(--purple);flex-shrink:0;width:15px;height:15px}
+.opt-text{font-size:14px;line-height:1.45;color:var(--text)}
+.likert-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border:0.5px solid var(--border);border-radius:var(--radius)}
+.likert-table{width:100%;border-collapse:collapse;min-width:460px}
+.likert-table th{font-weight:400;color:var(--text-muted);text-align:center;padding:8px 6px;font-size:12px;background:var(--bg-surface);border-bottom:0.5px solid var(--border)}
+.likert-table th:first-child{text-align:left;width:46%;padding-left:12px}
+.likert-table td{text-align:center;padding:10px 6px;border-top:0.5px solid var(--border)}
+.likert-table tbody tr:hover td{background:var(--bg-surface)}
+.likert-table td:first-child{text-align:left;font-size:13px;color:var(--text);padding-left:12px;padding-right:8px;line-height:1.4}
+.likert-table input[type=radio]{accent-color:var(--purple);width:16px;height:16px;cursor:pointer}
+input[type=text],input[type=email],textarea{width:100%;padding:10px 12px;border:0.5px solid var(--border);border-radius:var(--radius);font-size:14px;font-family:inherit;background:var(--bg);color:var(--text);outline:none;transition:border-color .15s}
+input[type=text]:focus,input[type=email]:focus,textarea:focus{border-color:var(--purple);box-shadow:0 0 0 3px var(--purple-light)}
+textarea{resize:vertical;min-height:90px;line-height:1.6}
+.err{font-size:12px;color:#D85A30;margin-top:5px;display:none}
+.err.show{display:block}
+.nav{display:flex;justify-content:space-between;align-items:center;margin-top:28px;padding-top:20px;border-top:0.5px solid var(--border)}
+.btn{padding:10px 22px;border-radius:var(--radius);font-size:14px;font-weight:500;cursor:pointer;transition:all .15s;border:0.5px solid var(--border-strong);background:var(--bg);color:var(--text);font-family:inherit}
+.btn:hover{background:var(--bg-surface)}
+.btn:active{transform:scale(.98)}
+.btn-primary{background:var(--purple);color:#fff;border-color:var(--purple)}
+.btn-primary:hover{background:var(--purple-dark);border-color:var(--purple-dark)}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.step-info{font-size:12px;color:var(--text-hint)}
+.save-indicator{font-size:11px;color:var(--teal);display:none;align-items:center;gap:4px}
+.save-indicator.show{display:flex}
+.save-indicator svg{width:12px;height:12px;fill:none;stroke:var(--teal);stroke-width:2.5}
+.success-wrap{text-align:center;padding:36px 16px}
+.success-icon{width:60px;height:60px;background:var(--teal-light);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 18px}
+.success-icon svg{width:28px;height:28px;fill:none;stroke:var(--teal);stroke-width:2.5}
+.success-title{font-size:20px;font-weight:600;margin-bottom:10px}
+.success-text{font-size:14px;color:var(--text-muted);line-height:1.75;margin-bottom:8px}
+@media(max-width:480px){.card{padding:20px 14px}.btn{padding:9px 16px;font-size:13px}}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo-row">
+    <div class="logo-mark"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5M2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+    <div class="uni-label">Bachelorarbeit &middot; Technische Hochschule Mannheim<br>Black Box vs. Compliance: EU AI Act und tiefe neuronale Netze</div>
+  </div>
+  <div class="progress-wrap">
+    <div class="progress-bg"><div class="progress-fill" id="pbar" style="width:0%"></div></div>
+    <div class="progress-meta">
+      <span id="plabel">Seite 1 von 6</span>
+      <span class="save-indicator" id="saved-ind"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Gespeichert</span>
+    </div>
+  </div>
+  <div id="content"></div>
+</div>
+
+<script>
+function uid(){return'sess_'+Math.random().toString(36).slice(2)+Date.now().toString(36)}
+const SESSION_ID = localStorage.getItem('euaiact_session') || (() => { const id=uid(); localStorage.setItem('euaiact_session',id); return id; })();
+const answers = JSON.parse(localStorage.getItem('euaiact_answers')||'{}');
+let step = parseInt(localStorage.getItem('euaiact_step')||'0');
+
+const steps = [
+  {
+    id:'intro', badge:'Willkommen',
+    title:'Umfrage: EU AI Act in der Praxis',
+    intro:'Diese Umfrage untersucht im Rahmen einer Bachelorarbeit an der Technischen Hochschule Mannheim, wie IT-Unternehmen mit den Anforderungen des EU AI Acts umgehen &ndash; insbesondere bezüglich des Black-Box-Problems bei tiefen neuronalen Netzen. Die Teilnahme dauert ca. 8&ndash;10 Minuten.',
+    notice:'Die Umfrage ist anonym. Für die Teilnahme am Gewinnspiel (1&nbsp;&times;&nbsp;10&nbsp;&euro; Amazon-/Wunschgutschein) können Sie optional Ihre E-Mail-Adresse angeben. Diese wird ausschließlich für die Gewinnerermittlung genutzt und nicht mit Ihren Antworten verknüpft.',
+    questions:[
+      {id:'email',type:'email',label:'E-Mail-Adresse (optional, nur für Gewinnspiel)',placeholder:'ihre@email.de'}
+    ]
+  },
+  {
+    id:'demographics', badge:'Abschnitt 1 &ndash; Angaben zum Unternehmen',
+    title:'Angaben zum Unternehmen',
+    questions:[
+      {id:'company_size',type:'radio',label:'Wie viele Mitarbeitende hat Ihr Unternehmen?',req:true,
+       opts:['1&ndash;10','11&ndash;50','51&ndash;250','251&ndash;1.000','Mehr als 1.000']},
+      {id:'role',type:'radio',label:'Welche Funktion haben Sie in Ihrem Unternehmen?',req:true,
+       opts:['Softwareentwicklung / Data Science','Technische Leitung / Architektur','Compliance / Recht / Datenschutz','Geschäftsführung / Management','Sonstige']},
+      {id:'sector',type:'radio',label:'In welcher Branche ist Ihr Unternehmen hauptsächlich tätig?',req:true,
+       opts:['Software- / Technologieunternehmen','Finanzdienstleistungen / FinTech','Gesundheitswesen / MedTech','Industrie / Fertigung','Beratung / IT-Dienstleistung','Sonstige']},
+      {id:'ai_use',type:'radio',label:'Setzt Ihr Unternehmen aktuell KI-Systeme produktiv ein?',req:true,
+       opts:['Ja, tiefe neuronale Netze (z.\u00a0B. CNN, LSTM, Transformer)','Ja, andere KI-Verfahren (z.\u00a0B. Entscheidungsbäume, klassisches ML)','Nein, aber geplant','Nein']}
+    ]
+  },
+  {
+    id:'awareness', badge:'Abschnitt 2 &ndash; Kenntnisstand EU AI Act',
+    title:'Kenntnisstand zum EU AI Act',
+    questions:[
+      {id:'know_aiact',type:'radio',label:'Wie gut kennen Sie die Anforderungen des EU AI Acts?',req:true,
+       opts:['Sehr gut &ndash; ich habe den Gesetzestext gelesen und bin mit den Details vertraut','Gut &ndash; ich kenne die wesentlichen Anforderungen','Grundlegend &ndash; ich weiß, dass es den EU AI Act gibt, kenne aber keine Details','Kaum &ndash; ich habe wenig davon gehört','Gar nicht']},
+      {id:'know_riskclass',type:'radio',label:'Wissen Sie, in welche Risikoklasse (gemäß EU AI Act) die KI-Systeme Ihres Unternehmens fallen?',req:true,
+       opts:['Ja, wir haben eine Klassifizierung durchgeführt','Teilweise &ndash; für einige Systeme ja','Nein, noch nicht analysiert','Nicht relevant für unser Unternehmen']},
+      {id:'compliance_status',type:'radio',label:'Wie würden Sie den aktuellen Compliance-Stand Ihres Unternehmens einschätzen?',req:true,
+       opts:['Vollständig konform','Weitgehend konform &ndash; kleinere Lücken bestehen','In Arbeit &ndash; wir sind aktiv dabei','Noch nicht begonnen','Nicht relevant für unser Unternehmen']}
+    ]
+  },
+  {
+    id:'blackbox', badge:'Abschnitt 3 &ndash; Black-Box-Problem',
+    title:'Umgang mit dem Black-Box-Problem',
+    questions:[
+      {id:'bb_awareness',type:'radio',label:'Ist das Black-Box-Problem bei tiefen neuronalen Netzen in Ihrem Unternehmen bekannt?',req:true,
+       opts:['Ja, es wird aktiv diskutiert und adressiert','Ja, es ist bekannt, wird aber nicht systematisch adressiert','Teilweise bekannt','Nein, kaum bekannt']},
+      {id:'xai_use',type:'checkbox',label:'Welche Erklärbarkeits&shy;methoden setzt Ihr Unternehmen ein? (Mehrfachauswahl)',
+       opts:['SHAP (SHapley Additive exPlanations)','LIME (Local Interpretable Model-Agnostic Explanations)','Grad-CAM','Attention-Visualisierung','Saliency Maps','Keine &ndash; wir nutzen intrinsisch interpretierbare Modelle','Keine Erklärbarkeits&shy;methoden','Sonstige']},
+      {id:'likert_challenges',type:'likert',
+       label:'Wie stark stimmen Sie folgenden Aussagen zu?',
+       hint:'1 = stimme gar nicht zu &nbsp;&nbsp; 5 = stimme voll zu',
+       scale:['1','2','3','4','5'],
+       items:[
+         'Die Intransparenz unserer KI-Systeme erschwert die Erfüllung der EU AI Act-Anforderungen erheblich.',
+         'Verfügbare XAI-Methoden (z.\u00a0B. SHAP, LIME) reichen aus, um die Transparenzanforderungen zu erfüllen.',
+         'Das Black-Box-Problem verringert das Vertrauen unserer Kunden in unsere KI-Systeme.',
+         'Wir sind bereit, Modellleistung zugunsten besserer Interpretierbarkeit zu opfern.'
+       ]}
+    ]
+  },
+  {
+    id:'compliance', badge:'Abschnitt 4 &ndash; Compliance-Herausforderungen',
+    title:'Herausforderungen bei der Umsetzung',
+    questions:[
+      {id:'likert_barriers',type:'likert',
+       label:'Wie groß sind folgende Herausforderungen bei der Umsetzung des EU AI Acts in Ihrem Unternehmen?',
+       hint:'1 = keine Herausforderung &nbsp;&nbsp; 5 = sehr große Herausforderung',
+       scale:['1','2','3','4','5'],
+       items:[
+         'Fehlende technische Standards für Erklärbarkeit',
+         'Unklare rechtliche Anforderungen / Interpretationsspielraum',
+         'Mangelndes internes Fachwissen zu regulatorischen Anforderungen',
+         'Hoher Aufwand für technische Dokumentation',
+         'Fehlende Tools zur Konformitätsbewertung',
+         'Wirtschaftliche Kosten der Compliance'
+       ]},
+      {id:'main_barrier',type:'radio',label:'Was ist die größte einzelne Hürde bei der Compliance Ihres Unternehmens?',req:true,
+       opts:['Technisch: Erklärbarkeit nicht realisierbar','Ressourcen: zu wenig Personal / Budget','Wissen: unklare Anforderungen des Gesetzes','Prozesse: fehlende interne Governance','Zeitdruck: zu kurze Umsetzungsfristen','Keine wesentliche Hürde']},
+      {id:'support_needed',type:'checkbox',label:'Welche Unterstützung wünschen Sie sich bei der Umsetzung? (Mehrfachauswahl)',
+       opts:['Klare technische Standards / Normen','Praxisbeispiele / Best Practices','Behördliche Leitfäden','Externe Beratung','Weiterbildungsangebote','Softwaretools zur Konformitätsbewertung','Keine Unterstützung notwendig']}
+    ]
+  },
+  {
+    id:'future', badge:'Abschnitt 5 &ndash; Einschätzungen & Ausblick',
+    title:'Persönliche Einschätzungen',
+    questions:[
+      {id:'feasibility',type:'radio',label:'Halten Sie es für technisch realisierbar, die Transparenzanforderungen des EU AI Acts für tiefe neuronale Netze vollständig zu erfüllen?',req:true,
+       opts:['Ja, vollständig realisierbar','Teilweise &ndash; für einfachere Anwendungsfälle ja','Nur mit erheblichen Kompromissen bei der Modellleistung','Nein, technisch nicht vollständig realisierbar','Weiß nicht']},
+      {id:'regulation_opinion',type:'radio',label:'Wie bewerten Sie den EU AI Act insgesamt?',req:true,
+       opts:['Sehr positiv &ndash; notwendig und sinnvoll','Positiv &ndash; gut gemeint, aber teils unpraktikabel','Neutral','Negativ &ndash; hemmt Innovation ohne ausreichenden Mehrwert','Sehr negativ']},
+      {id:'likert_future',type:'likert',
+       label:'Wie schätzen Sie die zukünftige Entwicklung ein?',
+       hint:'1 = stimme gar nicht zu &nbsp;&nbsp; 5 = stimme voll zu',
+       scale:['1','2','3','4','5'],
+       items:[
+         'Erklärbare KI wird in den nächsten 3 Jahren zum Standard in unserer Branche.',
+         'Der EU AI Act wird die Qualität von KI-Systemen in der EU verbessern.',
+         'Unternehmen ohne EU AI Act-Compliance werden erhebliche Wettbewerbsnachteile haben.'
+       ]},
+      {id:'open_comment',type:'textarea',label:'Haben Sie weitere Anmerkungen oder Erfahrungen, die Sie teilen möchten?',placeholder:'Ihre Anmerkungen (optional)...'}
+    ]
+  }
+];
+
+async function syncToServer(completed) {
+  try {
+    await fetch('/api/save', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({sessionId:SESSION_ID, step, answers, completed:!!completed})
+    });
+    const ind = document.getElementById('saved-ind');
+    if(ind){ind.classList.add('show');setTimeout(()=>ind.classList.remove('show'),2000);}
+  } catch(e){}
+}
+
+function saveLocal() {
+  localStorage.setItem('euaiact_answers', JSON.stringify(answers));
+  localStorage.setItem('euaiact_step', step);
+  syncToServer(false);
+}
+
+function pct() { return Math.round(((step) / steps.length) * 100); }
+
+function renderStep() {
+  const s = steps[step];
+  if (!s) { renderSuccess(); return; }
+  document.getElementById('pbar').style.width = pct() + '%';
+  document.getElementById('plabel').textContent = 'Seite ' + (step + 1) + ' von ' + steps.length;
+
+  let html = '';
+  html += '<div class="badge">' + s.badge + '</div>';
+  html += '<h1>' + s.title + '</h1>';
+  if (s.intro) html += '<p class="intro-text">' + s.intro + '</p>';
+  if (s.notice) html += '<div class="notice"><svg viewBox="0 0 24 24"><path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg><span>' + s.notice + '</span></div>';
+
+  s.questions.forEach(q => {
+    html += '<div class="q-block" id="qb_' + q.id + '">';
+    if (q.type === 'radio') {
+      html += '<div class="q-label">' + q.label + (q.req ? '<span class="q-req"> *</span>' : '') + '</div><div class="opts">';
+      q.opts.forEach(o => {
+        const plain = o.replace(/&[a-z]+;/g, s => ({  '&ndash;':'\u2013','&nbsp;':'\u00a0','&times;':'\u00d7','&euro;':'\u20ac','&middot;':'\u00b7' }[s]||s));
+        const sel = answers[q.id] === plain ? ' sel' : '';
+        html += '<label class="opt' + sel + '" onclick="selRadio(\'' + q.id + '\',this,\'' + plain.replace(/'/g,"\\'") + '\')"><input type="radio" name="' + q.id + '"' + (answers[q.id]===plain?' checked':'') + '><span class="opt-text">' + o + '</span></label>';
+      });
+      html += '</div><div class="err" id="err_' + q.id + '">Bitte wählen Sie eine Option.</div>';
+    } else if (q.type === 'checkbox') {
+      html += '<div class="q-label">' + q.label + '</div><div class="opts">';
+      const checked = answers[q.id] || [];
+      q.opts.forEach(o => {
+        const plain = o.replace(/&[a-z]+;/g, s => ({  '&ndash;':'\u2013','&nbsp;':'\u00a0','&shy;':'' }[s]||s));
+        const sel = checked.includes(plain) ? ' sel' : '';
+        html += '<label class="opt' + sel + '" onclick="toggleCheck(\'' + q.id + '\',\'' + plain.replace(/'/g,"\\'") + '\',this)"><input type="checkbox"' + (checked.includes(plain)?' checked':'') + '><span class="opt-text">' + o + '</span></label>';
+      });
+      html += '</div>';
+    } else if (q.type === 'likert') {
+      html += '<div class="q-label">' + q.label + '</div>';
+      if (q.hint) html += '<div class="q-hint">' + q.hint + '</div>';
+      html += '<div class="likert-wrap"><table class="likert-table"><thead><tr><th></th>';
+      q.scale.forEach(sv => html += '<th>' + sv + '</th>');
+      html += '</tr></thead><tbody>';
+      const saved = answers[q.id] || {};
+      q.items.forEach((item, ii) => {
+        html += '<tr><td>' + item + '</td>';
+        q.scale.forEach(sv => {
+          html += '<td><input type="radio" name="lik_' + q.id + '_' + ii + '" value="' + sv + '"' + (saved[item]===sv?' checked':'') + ' onchange="saveLikert(\'' + q.id + '\',\'' + item.replace(/'/g,"\\'") + '\',this.value)"></td>';
+        });
+        html += '</tr>';
+      });
+      html += '</tbody></table></div>';
+    } else if (q.type === 'email' || q.type === 'text') {
+      html += '<div class="q-label">' + q.label + '</div>';
+      html += '<input type="' + q.type + '" placeholder="' + (q.placeholder||'') + '" value="' + (answers[q.id]||'') + '" oninput="answers[\'' + q.id + '\']=this.value;saveLocal()">';
+    } else if (q.type === 'textarea') {
+      html += '<div class="q-label">' + q.label + '</div>';
+      html += '<textarea placeholder="' + (q.placeholder||'') + '" oninput="answers[\'' + q.id + '\']=this.value;saveLocal()">' + (answers[q.id]||'') + '</textarea>';
+    }
+    html += '</div>';
+  });
+
+  html += '<div class="nav"><span class="step-info">' + (step+1) + ' / ' + steps.length + '</span><div style="display:flex;gap:10px">';
+  if (step > 0) html += '<button class="btn" onclick="prevStep()">&#8592; Zurück</button>';
+  if (step < steps.length - 1) html += '<button class="btn btn-primary" onclick="nextStep()">Weiter &#8594;</button>';
+  else html += '<button class="btn btn-primary" onclick="submitSurvey()">Absenden</button>';
+  html += '</div></div>';
+
+  document.getElementById('content').innerHTML = html;
+}
+
+function selRadio(id, el, val) {
+  document.querySelectorAll('[name="' + id + '"]').forEach(r => r.closest('.opt').classList.remove('sel'));
+  el.classList.add('sel');
+  el.querySelector('input').checked = true;
+  answers[id] = val;
+  saveLocal();
+  const err = document.getElementById('err_' + id);
+  if (err) err.classList.remove('show');
+}
+
+function toggleCheck(id, val, el) {
+  if (!answers[id]) answers[id] = [];
+  const idx = answers[id].indexOf(val);
+  if (idx === -1) { answers[id].push(val); el.classList.add('sel'); el.querySelector('input').checked = true; }
+  else { answers[id].splice(idx,1); el.classList.remove('sel'); el.querySelector('input').checked = false; }
+  saveLocal();
+}
+
+function saveLikert(id, item, val) {
+  if (!answers[id]) answers[id] = {};
+  answers[id][item] = val;
+  saveLocal();
+}
+
+function validate() {
+  let ok = true;
+  steps[step].questions.forEach(q => {
+    if (q.req && !answers[q.id]) {
+      const err = document.getElementById('err_' + q.id);
+      if (err) err.classList.add('show');
+      if (ok) document.getElementById('qb_' + q.id).scrollIntoView({behavior:'smooth',block:'center'});
+      ok = false;
+    }
+  });
+  return ok;
+}
+
+function nextStep() {
+  if (!validate()) return;
+  step++; saveLocal(); renderStep(); window.scrollTo(0,0);
+}
+function prevStep() {
+  step--; saveLocal(); renderStep(); window.scrollTo(0,0);
+}
+async function submitSurvey() {
+  if (!validate()) return;
+  answers['_timestamp'] = new Date().toISOString();
+  await syncToServer(true);
+  localStorage.removeItem('euaiact_answers');
+  localStorage.removeItem('euaiact_step');
+  renderSuccess();
+}
+
+function renderSuccess() {
+  document.getElementById('pbar').style.width = '100%';
+  document.getElementById('plabel').textContent = 'Abgeschlossen';
+  document.getElementById('content').innerHTML = `
+    <div class="success-wrap">
+      <div class="success-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+      <div class="success-title">Vielen Dank f&uuml;r Ihre Teilnahme!</div>
+      <p class="success-text">Ihre Antworten wurden gespeichert und flie&szlig;en in die Bachelorarbeit ein.<br><br>
+      <em>Black Box vs. Compliance: Herausforderungen bei der Umsetzung des EU AI Acts in Unternehmen im Bezug auf tiefe neuronale Netze</em></p>
+    </div>`;
+}
+
+renderStep();
+</script>
+</body>
+</html>
